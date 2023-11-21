@@ -6,10 +6,9 @@ import cors from "cors";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: `${process.env.OPENAI_API_KEY}`,
 });
 
-//create instance of express
 const app = express();
 
 export const getStreamingCompletion = async ({ userPrompt }) => {
