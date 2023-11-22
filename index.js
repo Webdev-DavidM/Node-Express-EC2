@@ -21,17 +21,35 @@ export const getStreamingCompletion = async ({ prompt }) => {
   });
 };
 
-app.post("/", cors(), async (req, res) => {
+export const getOpenAiCompletion = async ({ prompt }) => {
+  return openai.chat.completions.create({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: prompt }],
+  });
+};
+
+app.use(cors());
+
+app.post("/placeSummary", async (req, res) => {
   const place = req.body.place;
-  console.log(place);
+
   const stream = await getStreamingCompletion({
-    prompt: `Please tell me the best five places to visit in ${place}`,
+    prompt: `Please give me a 5 line summary of how good ${place} is to visit `,
   });
   for await (const part of stream) {
-    console.log(part.choices[0]?.delta.content || "");
-    res.write(part.choices[0]?.delta.content || "");
+    if (part.choices[0]?.delta.content)
+      res.write(part.choices[0]?.delta.content || "");
   }
   res.end();
+});
+
+app.post("/topFivePlaces", async (req, res) => {
+  const place = req.body.place;
+  const response = await getOpenAiCompletion({
+    prompt: `Please give me the top five places to visit in ${place} with no description and each place separated by two spaces and no special characters or numbers and punctuation`,
+  });
+  const topFivePlaces = response.choices[0].message.content.split("  ");
+  res.json(topFivePlaces || []);
 });
 
 app.listen(4000, () => console.log("Listening on port 4000!"));
