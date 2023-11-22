@@ -30,6 +30,7 @@ export const getOpenAiCompletion = async ({ prompt }) => {
 
 app.use(cors());
 
+// This will stream the summary of the places to the react component
 app.post("/placeSummary", async (req, res) => {
   const place = req.body.place;
 
@@ -43,13 +44,24 @@ app.post("/placeSummary", async (req, res) => {
   res.end();
 });
 
+// This initial list of places will be used to the react component and also go to the lambda function which will get an image from the google places api
 app.post("/topFivePlaces", async (req, res) => {
   const place = req.body.place;
   const response = await getOpenAiCompletion({
-    prompt: `Please give me the top five places to visit in ${place} with no description and each place separated by two spaces and no special characters or numbers and punctuation`,
+    prompt: `Please give me the top five places to visit in ${place} with no summary or numbers or special characters and the places separated by a comma`,
   });
-  const topFivePlaces = response.choices[0].message.content.split("  ");
+  const topFivePlaces = response.choices[0].message.content.split(",");
   res.json(topFivePlaces || []);
+});
+
+// This will send the summary of the place to the react component
+app.post("/recommendedPlaceDescription", async (req, res) => {
+  const place = req.body.place;
+  const response = await getOpenAiCompletion({
+    prompt: `Please give me a five line summary of why ${place} is good to visit`,
+  });
+
+  res.json(response.choices[0].message.content || "");
 });
 
 app.listen(4000, () => console.log("Listening on port 4000!"));
