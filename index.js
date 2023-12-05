@@ -56,12 +56,23 @@ app.post("/topFivePlaces", async (req, res) => {
 
 // This will send the summary of the place to the react component
 app.post("/recommendedPlaceDescription", async (req, res) => {
-  const place = req.body.place;
-  const response = await getOpenAiCompletion({
-    prompt: `Please give me a five line summary of why ${place} is good to visit`,
-  });
+  const placesArray = req.body.placesArray;
 
-  res.json(response.choices[0].message.content || "");
+  const updatedPlaceArray = await Promise.all(
+    placesArray.map(async (place) => {
+      const response = await getOpenAiCompletion({
+        prompt: `Please give me a 100 word summary of why ${place} is good to visit`,
+      });
+      console.log(response.choices[0].message.content);
+      return {
+        place: `${place}`,
+        summary: response.choices[0].message.content || "",
+      };
+    })
+  );
+  console.log(updatedPlaceArray);
+
+  res.json(updatedPlaceArray || []);
 });
 
 app.listen(4000, () => console.log("Listening on port 4000!"));
