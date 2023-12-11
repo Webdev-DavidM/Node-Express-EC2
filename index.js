@@ -30,12 +30,16 @@ export const getOpenAiCompletion = async ({ prompt }) => {
 
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("hello from root");
+});
+
 // This will stream the summary of the places to the react component
 app.post("/placeSummary", async (req, res) => {
   const place = req.body.place;
 
   const stream = await getStreamingCompletion({
-    prompt: `Please give me a 5 line summary of how good ${place} is to visit `,
+    prompt: `Please give me a 100 word summary of why ${place} is good to visit`,
   });
   for await (const part of stream) {
     if (part.choices[0]?.delta.content)
