@@ -5,7 +5,7 @@ import OpenAI from "openai";
 import bodyParser from "body-parser";
 
 const openai = new OpenAI({
-  apiKey: `${process.env.OPENAI_KEY}`,
+  apiKey: "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",
 });
 
 const app = express();
@@ -31,7 +31,7 @@ export const getOpenAiCompletion = async ({ prompt }) => {
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("hello from root");
+  res.send(`${process.env.OPENAI_KEY}`);
 });
 
 app.post("/testPost", (req, res) => {
