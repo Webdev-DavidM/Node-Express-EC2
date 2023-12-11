@@ -34,6 +34,13 @@ app.get("/", (req, res) => {
   res.send("hello from root");
 });
 
+app.get("/testPost", (req, res) => {
+  const place = req.body.place;
+  res.send({
+    place: place,
+  });
+});
+
 // This will stream the summary of the places to the react component
 app.post("/placeSummary", async (req, res) => {
   const place = req.body.place;
